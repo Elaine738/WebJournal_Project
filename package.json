@@ -1,0 +1,24 @@
+{
+  "name": "webjournal_project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Elaine738/WebJournal_Project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Elaine738/WebJournal_Project/issues"
+  },
+  "homepage": "https://github.com/Elaine738/WebJournal_Project#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "express": "^4.21.2",
+    "uuid": "^11.0.5"
+  }
+}
