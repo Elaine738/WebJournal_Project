@@ -53,6 +53,40 @@ app.get('/newEntry', (req, res) => {
   });
 
 
+app.post('/newJournal', async(request,response) =>{
+  
+  let CIJ = "https://prod-03.ukwest.logic.azure.com:443/workflows/fe03f09bead94bf2991c35ed44e5f327/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=wSxGq-yTWriVowlNApTuLmCl9OwypgeSLs5oWobdQys";
+  const { journalName, UpFile  } = request.body;
+  submitData = new FormData();
+
+
+  try {
+    
+    submitData.append('File', UpFile);
+    submitData.append('journalName', journalName);
+    submitData.append('userID', 'example');
+    
+
+    $.ajax({
+        url: CIJ,
+        data: submitData,
+        cache: false,
+        enctype: 'multipart/form-data',
+        contentType: false,
+        processData: false,
+        type: 'POST',
+        success: function(){
+         
+        }
+      });
+
+
+    response.json({ message: 'Journal Created Successfully!' });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ error: 'Server error during creation' });
+  }
+})
 
 app.post('/register', async(request, response) =>{
     let CIU = "https://prod-04.ukwest.logic.azure.com/workflows/f0c9f6d8978f401bb66b505320f0405b/triggers/When_a_HTTP_request_is_received/paths/invoke/register?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=x64fYlaLHPsJ5ovDODDeknsf--aJLEMOFLYwACzO5C0";
