@@ -1,16 +1,41 @@
 const {EventEmitter} = require('events');
 const { readFile, readFileSync } = require('fs');
-const express = require('express');
 const path = require('path');
+const express = require("express"),
+    mongoose = require("mongoose"),
+    passport = require("passport"),
+    bodyParser = require("body-parser"),
+    LocalStrategy = require("passport-local"),
+    passportLocalMongoose = 
+        require("passport-local-mongoose")
+const User = require("./model/User");
 
 
 const app = express();
 const port = 3000;
 
+mongoose.connect("mongodb://localhost/27017");
+app.set("view engine", "ejs");
+
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 
+// Geeks For Geeks Registration code
+app.use(require("express-session")({
+    secret: "Pathologic Polyhedron",
+    resave: false,
+    saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+//end of geeks for geeks code
 
 app.use(express.static('public', {
     setHeaders: (res, path) => {
@@ -20,74 +45,94 @@ app.use(express.static('public', {
     }
 }));
 
+//Routes:
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'home.html'));
+    res.render("home");
   });
 
 app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'login.html'));
+    res.render("login")
   });
 
 app.get('/register', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'register.html'));
+    res.render("register")
   });
 
-app.get('/dashboard', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'viewJournals.html'));
+app.get('/dashboard', isLoggedIn, (req, res) => {
+  res.render("viewJournals")
   });
 
-app.get('/entries', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'entriesList.html'));
+app.get('/entries', isLoggedIn, (req, res) => {
+  res.render("entriesList")
   });
 
-app.get('/entry', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'viewEntry.html'));
+app.get('/entry', isLoggedIn, (req, res) => {
+  res.render("viewEntry")
   });
 
-app.get('/newJournal', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'createJournal.html'));
+app.get('/newJournal', isLoggedIn, (req, res) => {
+  res.render("createJournal")
   });
 
-app.get('/newEntry', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'createEntry.html'));
+app.get('/newEntry', isLoggedIn, (req, res) => {
+  res.render("createEntry")
   });
 
-
-app.post('/newJournal', async(request,response) =>{
-  
-  let CIJ = "https://prod-03.ukwest.logic.azure.com:443/workflows/fe03f09bead94bf2991c35ed44e5f327/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=wSxGq-yTWriVowlNApTuLmCl9OwypgeSLs5oWobdQys";
-  const { journalName, UpFile  } = request.body;
-  submitData = new FormData();
+//end of routes
 
 
+//User Registration System
+app.post("/register", async (req, res) => {
+  const user = await User.create({
+    email: req.body.email,
+    username: req.body.username,
+    password: req.body.password
+  });
+
+  return res.status(200) && res.redirect("home"); 
+});
+
+//User login
+app.post("/login", async function(req, res){
   try {
-    
-    submitData.append('File', UpFile);
-    submitData.append('journalName', journalName);
-    submitData.append('userID', 'example');
-    
-
-    $.ajax({
-        url: CIJ,
-        data: submitData,
-        cache: false,
-        enctype: 'multipart/form-data',
-        contentType: false,
-        processData: false,
-        type: 'POST',
-        success: function(){
-         
+      // check if the user exists
+      const user = await User.findOne({ email: req.body.email });
+      if (user) {
+        //check if password matches
+        const result = req.body.password === user.password;
+        if (result) {
+          res.render("viewJournals");
+        } else {
+          res.status(400).json({ error: "password doesn't match" });
         }
-      });
+      } else {
+        res.status(400).json({ error: "User doesn't exist" });
+      }
+    } catch (error) {
+      res.status(400).json({ error });
+    }
+});
 
 
-    response.json({ message: 'Journal Created Successfully!' });
-  } catch (error) {
-    console.error(error);
-    response.status(500).json({ error: 'Server error during creation' });
-  }
-})
+//Handling user logout 
+app.get("/logout", function (req, res) {
+  req.logout(function(err) {
+      if (err) { return next(err); }
+      res.redirect('/');
+    });
+});
 
+
+// function to check users log in status
+function isLoggedIn(req, res, next) {
+  if (req.isAuthenticated()) return next();
+  res.redirect("/login");
+}
+
+
+
+
+/* old register system
 app.post('/register', async(request, response) =>{
     let CIU = "https://prod-04.ukwest.logic.azure.com/workflows/f0c9f6d8978f401bb66b505320f0405b/triggers/When_a_HTTP_request_is_received/paths/invoke/register?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=x64fYlaLHPsJ5ovDODDeknsf--aJLEMOFLYwACzO5C0";
 
@@ -124,6 +169,7 @@ app.post('/register', async(request, response) =>{
     res.status(500).json({ error: 'Server error during registration' });
   }
 })
+*/
   
 
 app.listen(port, () => {
