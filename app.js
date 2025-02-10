@@ -10,7 +10,6 @@ const express = require("express"),
         require("passport-local-mongoose")
 const User = require("./model/User");
 
-
 const app = express();
 const port = 3000;
 
@@ -37,6 +36,8 @@ passport.deserializeUser(User.deserializeUser());
 
 //end of geeks for geeks code
 
+
+// fix for MIME type error when trying to invoke javascript files
 app.use(express.static('public', {
     setHeaders: (res, path) => {
         if (path.endsWith('.js')) {
