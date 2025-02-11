@@ -46,9 +46,18 @@
       <div class="row align-items-start">
         <div class="col-2"></div>
         <div class="col-8" style="text-align: left;">
-          <div style="padding: 5px;">
-            <button id="getJournals" type="button" class="btn btn-primary">View Journals</button>
-          </div>
+          <script>
+            //calls the method in the manageJournal.js file to retrieve the users current Journals
+            getJournals();
+          </script>
+
+          <!--Redirects the user upon clicking the journal to the entries page
+          <a href = "/entries">
+            <div id="JournalList">
+            </div>
+        </a>
+        -->
+        <div id="JournalList"></div>
           <div id="JournalList">
             <h4>Please click the view journals button if you wish to view your journals.</h4>
           </div>

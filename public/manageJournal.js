@@ -53,8 +53,11 @@ function submitNewJournal(){
  processData: false,
  type: 'POST',
  success: function(data){
-
  }
+ .done(function() {
+  alert("Journal created successfully!");
+  getJournals();
+})
  });
   
 
@@ -74,6 +77,8 @@ function getJournals() {
       items.push("<hr />");
       items.push(val["journalName"] + "<br />");
       items.push("<img src='" + BLOB_ACCOUNT + val["filePath"] + "' width='400'/> <br/>");
+      items.push(`<button class='btn btn-secondary delete-button' data-id='${val["id"]}' style='margin-top: 10px;'>Delete Entry</button><br/>`);
+      items.push(`<button class='btn btn-primary edit-button' data-id='${val["id"]}' style='margin-top: 10px;'>Edit Entry</button> <br/>`);
       items.push("<hr />");
       
     });
@@ -97,7 +102,9 @@ function getJournals() {
     $(".edit-button").on("click", function() {
       const journalId = $(this).data("id"); 
       $.getJSON(RIJ1 + journalId + RIJ2, function(data) {
-        $("#editJournalName").val(data.Documents.journalName);
+        $("#editJournalName").val(data.journalName);
+        console.log("#editJournalName:", $("#editJournalName").val())
+        //$("#editJournalName").val(data.journalName);
     
         $("#EditJournal").show(); 
         $("#JournalList").hide(); 
@@ -124,8 +131,9 @@ function getJournals() {
           filePath: data.filePath,
           fileLocator: journalId,
           userID: data.userID,
-          title: $("#editJournalName").val() || data.journalName,
+          journalName: $("#editJournalName").val(),
         };
+        console.log(updatedData);
 
     
         // Send the PUT request
@@ -136,8 +144,6 @@ function getJournals() {
           contentType: "application/json",
           success: function() {
             alert("Journal updated successfully!");
-            console.log("GET URL:", GETJOURNAL);
-            console.log("Received data:", data);
             getJournals();
             $("#EditJournal").hide();
             $("#JournalList").show(); 
