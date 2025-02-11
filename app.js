@@ -90,7 +90,7 @@ app.post("/register", async (req, res) => {
     password: req.body.password
   });
 
-  return res.status(200) && res.redirect("home"); 
+  return res.status(200) && res.redirect("/"); 
 });
 
 //User login
