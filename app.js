@@ -36,6 +36,7 @@ passport.deserializeUser(User.deserializeUser());
 
 //end of geeks for geeks code
 
+//const User = require('./model/User');
 
 // fix for MIME type error when trying to invoke javascript files
 app.use(express.static('public', {
@@ -59,24 +60,36 @@ app.get('/register', (req, res) => {
     res.render("register")
   });
 
-app.get('/dashboard', isLoggedIn, (req, res) => {
-  res.render("viewJournals")
+app.get('/dashboard', (req, res) => {
+  if (!req.session.userId) {
+    return res.redirect('/login');
+}
+  res.render('viewJournals', { userId: req.session.userId });
   });
 
 app.get('/entries', isLoggedIn, (req, res) => {
-  res.render("entriesList")
+  if (!req.session.userId) {
+    return res.redirect('/login');
+}
+  res.render("entriesList", { userId: req.session.userId })
   });
 
 app.get('/entry', isLoggedIn, (req, res) => {
+  if (!req.session.userId) {
+    return res.redirect('/login');
+}
   res.render("viewEntry")
   });
 
-app.get('/newJournal', isLoggedIn, (req, res) => {
-  res.render("createJournal")
+app.get('/newJournal', (req, res) => {
+  if (!req.session.userId) {
+    return res.redirect('/login');
+}
+  res.render("createJournal", { userId: req.session.userId });
   });
 
 app.get('/newEntry', isLoggedIn, (req, res) => {
-  res.render("createEntry")
+  res.render("createEntry", { userId: req.session.userId });
   });
 
 //end of routes
@@ -102,7 +115,9 @@ app.post("/login", async function(req, res){
         //check if password matches
         const result = req.body.password === user.password;
         if (result) {
-          res.render("viewJournals");
+          req.session.userId = user._id;
+          res.redirect('/dashboard');
+          return;
         } else {
           res.status(400).json({ error: "password doesn't match" });
         }
@@ -122,16 +137,6 @@ app.get("/logout", function (req, res) {
       res.redirect('/');
     });
 });
-
-
-// function to check users log in status
-function isLoggedIn(req, res, next) {
-  if (req.isAuthenticated()) return next();
-  res.redirect("/login");
-}
-
-
-
 
 /* old register system
 app.post('/register', async(request, response) =>{

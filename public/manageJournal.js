@@ -18,6 +18,7 @@ UIJ2 = "?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received
 //Link to blob account where multimedia is stored
 BLOB_ACCOUNT = "https://webjournalstorage.blob.core.windows.net";
 
+
 //Handlers for button clicks
 $(document).ready(function() {
 
@@ -35,13 +36,12 @@ $(document).ready(function() {
 
 //function called to add new journal to DB hosted on Azure
 function submitNewJournal(){
-
-  //Create a form data object
+ //Create a form data object
  submitData = new FormData();
  //Get form variables and append them to the form data object
  submitData.append('journalName', $('#title').val());
  submitData.append('File', $("#UpFile")[0].files[0]);
- submitData.append('userID', 'userID');
+ submitData.append('userID', userId);
 
  //Post the form data to the CIJ (create individual journal) endpoint in azure
  $.ajax({
@@ -53,11 +53,13 @@ function submitNewJournal(){
  processData: false,
  type: 'POST',
  success: function(data){
+  
  }
- .done(function() {
+ /*.done(function() {
   alert("Journal created successfully!");
   getJournals();
 })
+  */
  });
   
 
@@ -77,8 +79,8 @@ function getJournals() {
       items.push("<hr />");
       items.push(val["journalName"] + "<br />");
       items.push("<img src='" + BLOB_ACCOUNT + val["filePath"] + "' width='400'/> <br/>");
-      items.push(`<button class='btn btn-secondary delete-button' data-id='${val["id"]}' style='margin-top: 10px;'>Delete Entry</button><br/>`);
-      items.push(`<button class='btn btn-primary edit-button' data-id='${val["id"]}' style='margin-top: 10px;'>Edit Entry</button> <br/>`);
+      items.push(`<button class='btn btn-secondary delete-button' data-id='${val["id"]}' style='margin-top: 10px;'>Delete Journal</button><br/>`);
+      items.push(`<button class='btn btn-primary edit-button' data-id='${val["id"]}' style='margin-top: 10px;'>Edit Journal</button> <br/>`);
       items.push("<hr />");
       
     });
@@ -133,8 +135,6 @@ function getJournals() {
           userID: data.userID,
           journalName: $("#editJournalName").val(),
         };
-        console.log(updatedData);
-
     
         // Send the PUT request
         $.ajax({
