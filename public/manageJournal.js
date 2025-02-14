@@ -3,7 +3,8 @@
 //Create Individual Journal - allows user to create their new journal
 CIJ = "https://prod-03.ukwest.logic.azure.com:443/workflows/fe03f09bead94bf2991c35ed44e5f327/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=wSxGq-yTWriVowlNApTuLmCl9OwypgeSLs5oWobdQys";
 //Retrieve All Journals - allows user to view their journals upon registering or logging in
-RAJ = "https://prod-00.uksouth.logic.azure.com:443/workflows/dbebdcf4ca5c4b9c9e991fe436cf1f38/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=4a-KNy3roqCYdg_IYc3xhnFPsW5FtZ1oxJcgtJRWqCs";
+RAJ1 = "https://prod-00.uksouth.logic.azure.com/workflows/dbebdcf4ca5c4b9c9e991fe436cf1f38/triggers/When_a_HTTP_request_is_received/paths/invoke/journals/";
+RAJ2 = "?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=4a-KNy3roqCYdg_IYc3xhnFPsW5FtZ1oxJcgtJRWqCs";
 //Retrieve Individual Journal - needed for editing details
 RIJ1 = "https://prod-19.uksouth.logic.azure.com/workflows/4c3c838289dc490f9949823edeb1c51b/triggers/When_a_HTTP_request_is_received/paths/invoke/journal/";
 RIJ2 = "?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=D65TyHGar6T6FWvLZfuZ80Qv8kYoEZBjeQ-3I0Jw2H4";
@@ -17,7 +18,6 @@ UIJ1 = "https://prod-08.ukwest.logic.azure.com/workflows/bf91eab02c924b2592ad484
 UIJ2 = "?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=soAytIHb0W3cPy6tS0meZ8e3Rk-vCLF47nUSIu843hQ";
 //Link to blob account where multimedia is stored
 BLOB_ACCOUNT = "https://webjournalstorage.blob.core.windows.net";
-
 
 //Handlers for button clicks
 $(document).ready(function() {
@@ -67,20 +67,24 @@ function submitNewJournal(){
 
 function getJournals() {
   $('#JournalList').html('<div class="spinner-border" role="status"><span class="sr-only">&nbsp;</span></div>');
+  //RUJ = retrieve users journals - other users journals will not be visible
+  RUJ = RAJ1 + userId + RAJ2;
+  console.log(RUJ);
 
-  $.getJSON(RAJ, function(data) {
+  $.getJSON(RUJ, function(data) {
     var items = [];
     // Create an array to hold the users Journals
     var items = [];
 
     // Iterate through the returned records and build HTML
-    $.each(data.Documents, function(key, val) {
+    $.each(data, function(key, val) {
       console.log(data);
       items.push("<hr />");
       items.push(val["journalName"] + "<br />");
       items.push("<img src='" + BLOB_ACCOUNT + val["filePath"] + "' width='400'/> <br/>");
       items.push(`<button class='btn btn-secondary delete-button' data-id='${val["id"]}' style='margin-top: 10px;'>Delete Journal</button><br/>`);
       items.push(`<button class='btn btn-primary edit-button' data-id='${val["id"]}' style='margin-top: 10px;'>Edit Journal</button> <br/>`);
+      items.push(`<button class='btn btn-primary' data-id='${val["id"]}' style='margin-top: 10px;'>Add Entry</button> <br/>`);
       items.push("<hr />");
       
     });

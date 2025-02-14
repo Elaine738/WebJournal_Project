@@ -6,9 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <script>
-    const userId = "<%= userId %>"; // Inject user ID into JavaScript
-    console.log("User ID:", userId);
+    const userId = "<%= userId %>"; // declare the user ID to be used in javascript
+    const username = "<%= username %>"; // declare the username to be used in html
     </script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Audiowide">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
   <script type="text/javascript" src="/manageJournal.js"></script>
@@ -43,7 +44,11 @@
         </div>
     </nav>
 
-    <p>test message - view journals</p>
+    <span style="color:rgb(55, 136, 187);font-weight:bold;font-size: 30px;font-family:Audiowide, sans-serif">
+    <script>
+      document.write("Hi, ", username, "!");
+      </script>
+    </span>
 
     <div class="container">
 

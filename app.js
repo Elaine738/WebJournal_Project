@@ -64,17 +64,17 @@ app.get('/dashboard', (req, res) => {
   if (!req.session.userId) {
     return res.redirect('/login');
 }
-  res.render('viewJournals', { userId: req.session.userId });
+  res.render('viewJournals', { userId: req.session.userId, username: req.session.username });
   });
 
-app.get('/entries', isLoggedIn, (req, res) => {
+app.get('/entries', (req, res) => {
   if (!req.session.userId) {
     return res.redirect('/login');
 }
   res.render("entriesList", { userId: req.session.userId })
   });
 
-app.get('/entry', isLoggedIn, (req, res) => {
+app.get('/entry', (req, res) => {
   if (!req.session.userId) {
     return res.redirect('/login');
 }
@@ -88,7 +88,7 @@ app.get('/newJournal', (req, res) => {
   res.render("createJournal", { userId: req.session.userId });
   });
 
-app.get('/newEntry', isLoggedIn, (req, res) => {
+app.get('/newEntry',(req, res) => {
   res.render("createEntry", { userId: req.session.userId });
   });
 
@@ -116,6 +116,7 @@ app.post("/login", async function(req, res){
         const result = req.body.password === user.password;
         if (result) {
           req.session.userId = user._id;
+          req.session.username = user.username;
           res.redirect('/dashboard');
           return;
         } else {
