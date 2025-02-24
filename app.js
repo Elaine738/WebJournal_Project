@@ -8,6 +8,7 @@ const express = require("express"),
     LocalStrategy = require("passport-local"),
     passportLocalMongoose = 
         require("passport-local-mongoose")
+
 const User = require("./model/User");
 
 const app = express();
@@ -67,18 +68,12 @@ app.get('/dashboard', (req, res) => {
   res.render('viewJournals', { userId: req.session.userId, username: req.session.username });
   });
 
-app.get('/entries', (req, res) => {
+app.get('/entries/:id', (req, res) => {
   if (!req.session.userId) {
     return res.redirect('/login');
 }
-  res.render("entriesList", { userId: req.session.userId })
-  });
-
-app.get('/entry', (req, res) => {
-  if (!req.session.userId) {
-    return res.redirect('/login');
-}
-  res.render("viewEntry")
+  const journalId = req.params.id;
+  res.render("entriesList", { userId: req.session.userId, username: req.session.username, journalId: journalId })
   });
 
 app.get('/newJournal', (req, res) => {
@@ -88,8 +83,9 @@ app.get('/newJournal', (req, res) => {
   res.render("createJournal", { userId: req.session.userId });
   });
 
-app.get('/newEntry',(req, res) => {
-  res.render("createEntry", { userId: req.session.userId });
+app.get('/newEntry/:id',(req, res) => {
+  const journalId = req.params.id;
+  res.render("createEntry", { journalId: journalId });
   });
 
 //end of routes

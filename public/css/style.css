@@ -1,0 +1,15 @@
+#example1 {
+  border: 10px dashed black;
+  padding: 25px;
+  background-color: peachpuff;
+  background-repeat: no-repeat;
+  background-origin: padding-box;
+}
+
+body{
+  background-color: rgb(252, 239, 193);
+  color: #636b6f;
+  font-family: 'Raleway';
+  height: 100vh;
+  margin: 0;
+}

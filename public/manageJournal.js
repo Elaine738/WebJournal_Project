@@ -84,7 +84,7 @@ function getJournals() {
       items.push("<img src='" + BLOB_ACCOUNT + val["filePath"] + "' width='400'/> <br/>");
       items.push(`<button class='btn btn-secondary delete-button' data-id='${val["id"]}' style='margin-top: 10px;'>Delete Journal</button><br/>`);
       items.push(`<button class='btn btn-primary edit-button' data-id='${val["id"]}' style='margin-top: 10px;'>Edit Journal</button> <br/>`);
-      items.push(`<button class='btn btn-primary' data-id='${val["id"]}' style='margin-top: 10px;'>Add Entry</button> <br/>`);
+      items.push(`<button class='btn btn-primary view-entries' data-id='${val["id"]}' style='margin-top: 10px;'>View Entries</button> <br/>`);
       items.push("<hr />");
       
     });
@@ -103,6 +103,13 @@ function getJournals() {
       if (confirm("Are you sure you want to delete this Journal? All entries entered will also be deleted!")) {
         deleteJournal(journalId);
       }
+    });
+
+    $(".view-entries").on("click", function(req, res) {
+      const journalId = $(this).data("id");
+      console.log(journalId);
+      window.location = '/entries/' + journalId;
+      //res.redirect('/entries/' + journalId);
     });
 
     $(".edit-button").on("click", function() {
