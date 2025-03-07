@@ -1,6 +1,7 @@
 const {EventEmitter} = require('events');
 const { readFile, readFileSync } = require('fs');
 const path = require('path');
+const bcrypt = require('bcrypt');
 const express = require("express"),
     mongoose = require("mongoose"),
     passport = require("passport"),
@@ -48,6 +49,15 @@ app.use(express.static('public', {
     }
 }));
 
+// fix for MIME type error when trying to invoke css files
+app.use(express.static('public', {
+  setHeaders: (res, path) => {
+      if (path.endsWith('.css')) {
+          res.setHeader('Content-Type', 'text/css');
+      }
+  }
+}));
+
 //Routes:
 app.get('/', (req, res) => {
     res.render("home");
@@ -85,18 +95,24 @@ app.get('/newJournal', (req, res) => {
 
 app.get('/newEntry/:id',(req, res) => {
   const journalId = req.params.id;
-  res.render("createEntry", { journalId: journalId });
+  res.render("createEntry", { journalId: journalId, userId: req.session.userId });
   });
+
+  app.get('/account',(req, res) => {
+    res.render("account", { userId: req.session.userId, username: req.session.username});
+    });
 
 //end of routes
 
 
 //User Registration System
 app.post("/register", async (req, res) => {
+  const hash = bcrypt.hashSync(req.body.password, 10);
+
   const user = await User.create({
     email: req.body.email,
     username: req.body.username,
-    password: req.body.password
+    password: hash
   });
 
   return res.status(200) && res.redirect("/"); 
@@ -107,23 +123,28 @@ app.post("/login", async function(req, res){
   try {
       // check if the user exists
       const user = await User.findOne({ email: req.body.email });
-      if (user) {
-        //check if password matches
-        const result = req.body.password === user.password;
-        if (result) {
-          req.session.userId = user._id;
-          req.session.username = user.username;
-          res.redirect('/dashboard');
-          return;
-        } else {
-          res.status(400).json({ error: "password doesn't match" });
-        }
-      } else {
-        res.status(400).json({ error: "User doesn't exist" });
-      }
+      if (user && bcrypt.compareSync(req.body.password, user.password)) {
+        req.session.userId = user._id;
+        req.session.username = user.username;
+        res.redirect('/dashboard');
+        return;
+      } 
     } catch (error) {
-      res.status(400).json({ error });
+      res.status(400).send({ error });
     }
+});
+
+app.post("/deleteAccount", async function(req, res){
+  const userId = req.params;
+  const user = await User.findOne({ "_id": ObjectId(userId) });
+  if (user) {
+    User.deleteOne(user, function(err, obj) {
+      if (err) throw err;
+      console.log("1 document deleted");
+  });
+}else{
+  res.status(400).send({ error });
+}
 });
 
 
@@ -134,6 +155,7 @@ app.get("/logout", function (req, res) {
       res.redirect('/');
     });
 });
+
 
 /* old register system
 app.post('/register', async(request, response) =>{

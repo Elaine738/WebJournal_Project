@@ -45,23 +45,18 @@ function submitNewJournal(){
 
  //Post the form data to the CIJ (create individual journal) endpoint in azure
  $.ajax({
- url: CIJ,
- data: submitData,
- cache: false,
- enctype: 'multipart/form-data',
- contentType: false,
- processData: false,
- type: 'POST',
- success: function(data){
-  
- }
- /*.done(function() {
-  alert("Journal created successfully!");
-  getJournals();
-})
-  */
- });
-  
+  url: CIJ,
+  data: submitData,
+  cache: false,
+  enctype: 'multipart/form-data',
+  contentType: false,
+  processData: false,
+  type: 'POST',
+  success: function(data){
+    alert("Journal created successfully!");
+    document.getElementById("newJournalForm").reset();
+  }
+});  
 
 }
 
@@ -80,10 +75,11 @@ function getJournals() {
     $.each(data, function(key, val) {
       console.log(data);
       items.push("<hr />");
-      items.push(val["journalName"] + "<br />");
-      items.push("<img src='" + BLOB_ACCOUNT + val["filePath"] + "' width='400'/> <br/>");
-      items.push(`<button class='btn btn-secondary delete-button' data-id='${val["id"]}' style='margin-top: 10px;'>Delete Journal</button><br/>`);
-      items.push(`<button class='btn btn-primary edit-button' data-id='${val["id"]}' style='margin-top: 10px;'>Edit Journal</button> <br/>`);
+      items.push("<h1 style='font-size:25px;'>" + val["journalName"] + "</h1> <br />");
+      items.push("<img src='" + BLOB_ACCOUNT + val["filePath"] + "'class='img-thumbnail' width='400'/> <br/>");
+
+      items.push(`<button class='btn btn-outline-danger delete-button' data-id='${val["id"]}' style='margin-top: 10px;'>Delete Journal</button><br/>`);
+      items.push(`<button class='btn btn-outline-secondary edit-button' data-id='${val["id"]}' style='margin-top: 10px;'>Edit Journal</button> <br/>`);
       items.push(`<button class='btn btn-primary view-entries' data-id='${val["id"]}' style='margin-top: 10px;'>View Entries</button> <br/>`);
       items.push("<hr />");
       
@@ -93,14 +89,13 @@ function getJournals() {
     $('#JournalList').empty();
 
     $("<ul/>", {
-      "class": "my-new-list",
+      "class": "journals",
       html: items.join("")
     }).appendTo("#JournalList");
 
-
     $(".delete-button").on("click", function() {
-      const journalId = $(this).data("id"); // Retrieve the id from the data-id attribute
-      if (confirm("Are you sure you want to delete this Journal? All entries entered will also be deleted!")) {
+      const journalId = $(this).data("id"); 
+      if (confirm("Are you sure you want to delete this journal?")) {
         deleteJournal(journalId);
       }
     });
@@ -109,7 +104,6 @@ function getJournals() {
       const journalId = $(this).data("id");
       console.log(journalId);
       window.location = '/entries/' + journalId;
-      //res.redirect('/entries/' + journalId);
     });
 
     $(".edit-button").on("click", function() {
@@ -165,8 +159,6 @@ function getJournals() {
         });
       });
     });
-    
-  
 
   });
 }

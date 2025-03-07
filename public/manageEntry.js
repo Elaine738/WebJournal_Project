@@ -1,4 +1,6 @@
 //Create Individual Entry
+//CIE = "https://prod-18.uksouth.logic.azure.com:443/workflows/a08efa0d6edb484ab386ed85ec2e11d7/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=QoI6B1BscubW6pOEVe0IMwl_9GGeSvbLnptJwMJx1q4";
+
 CIE = "https://prod-18.uksouth.logic.azure.com:443/workflows/a08efa0d6edb484ab386ed85ec2e11d7/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=QoI6B1BscubW6pOEVe0IMwl_9GGeSvbLnptJwMJx1q4";
 
 //Retrieve All Entries - this logic app gets every entry correlating to a specific journal ID
@@ -86,8 +88,31 @@ function submitNewEntry(){
  submitData.append('body', $('#body').val());
  submitData.append('createdAt', currentDate);
  submitData.append('journalID', journalId);
- submitData.append('File', $("#imageInput")[0].files[0]);
+ submitData.append('userID', userId);
 
+ if($("#imageInput")[0].files[0] == undefined){
+  
+ }
+ 
+ submitData.append('image', $("#imageInput")[0].files[0]);
+ console.log('imageInput: ', $("#imageInput")[0].files[0]);
+
+ submitData.append('video', $("#videoInput")[0].files[0]);
+ console.log('videoInput: ', $("#videoInput")[0].files[0]);
+
+ submitData.append('audio', $("#audioInput")[0].files[0]);
+ console.log('audioInput: ', $("#audioInput")[0].files[0]);
+
+ /*
+ // multiple files can be added to 1 entry
+ // this will loop through each file to add them individually
+ var fileInput = document.getElementById('imageInput');
+ var files = fileInput.files;
+ for (var i = 0; i < files.length; i++) {
+  submitData.append('images', files[i])
+  console.log('images:', files[i]);
+}
+*/
 
  $.ajax({
   url: CIE,
@@ -98,6 +123,8 @@ function submitNewEntry(){
   processData: false,
   type: 'POST',
   success: function(data){
+    alert("Entry created successfully!");
+    window.location = 'entries/' + journalId;
 
  }
  });
@@ -147,8 +174,46 @@ function getEntries() {
 
         document.getElementById('entryTitle').innerHTML = data.title;
         document.getElementById('entryBody').innerHTML = data.body;
-        document.getElementById('entryImage').src =  BLOB_ACCOUNT + data.filePath;
-        console.log(document.getElementById('entryImage'));
+        var img = document.getElementById('entryImage');
+        var imagefilePath = data.imageFilePath;
+        console.log('data.imageFilePath: ',data.imageFilePath);
+
+        img.src = BLOB_ACCOUNT + data.imageFilePath;
+        console.log('Image: ', img.src);
+        
+        //if a image was not chosen when creating the entry - do not display the broken image icon
+        if(img.src == 'https://webjournalstorage.blob.core.windows.netundefined/'){
+          img.style.display = "none";
+        }
+
+        var video = document.getElementById('entryVideo');
+        var videoSource = document.getElementById('entryVideoSource');
+        var videofilePath = data.videoFilePath;
+
+        videoSource.src = BLOB_ACCOUNT + videofilePath;
+          videoSource.type = "video/mp4";
+          video.load();
+          console.log('Video display: ', videoSource.src);
+        
+        //if an image was not chosen when creating the entry - do not display the broken image icon
+        if(videoSource.src == 'https://webjournalstorage.blob.core.windows.netundefined/'){
+          video.style.display = "none";
+          console.log('video undefined');
+        }
+
+        var audio = document.getElementById('entryAudio');
+        var audiofilePath = data.audioFilePath;
+
+        audio.src = BLOB_ACCOUNT + audiofilePath;
+          console.log('audio.src: ', document.getElementById('entryAudio').src);
+          audio.type = "audio/mp3";
+          console.log('Else statement');
+        
+        //if an image was not chosen when creating the entry - do not display the broken image icon
+        if(audio.src == 'https://webjournalstorage.blob.core.windows.netundefined/'){
+          audio.style.display = "none";
+          console.log('filePath != undefined');
+        }
 
         $("#ViewEntry").show();
         $("#EntriesList").hide();

@@ -2,14 +2,66 @@
   border: 10px dashed black;
   padding: 25px;
   background-color: peachpuff;
+  background-color: rgb(252, 239, 193);
   background-repeat: no-repeat;
   background-origin: padding-box;
 }
 
 body{
-  background-color: rgb(252, 239, 193);
+  background-color: peachpuff;
   color: #636b6f;
   font-family: 'Raleway';
   height: 100vh;
   margin: 0;
+}
+
+#journalStyle{
+  background-color: rgb(191, 101, 37);
+  align-items: center;
+}
+
+#logo{
+  font-family:Playwrite IT Moderna, serif;
+}
+
+
+.center {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  text-align: center;
+  font-size: 40px;
+  color: antiquewhite;
+  background-color: rgba(71, 3, 3, 0.411);
+}
+
+
+.item {
+  border-radius: 0.5em;
+  padding: 20px;
+  text-align: center;
+  font-size: 40px;
+  background-color: rgba(248, 52, 52, 0.162);
+  color: antiquewhite;
+  width: 400px;
+  height: 200px;
+}
+
+.box {
+  height: 80%;
+  width: 100%;
+  border-radius: 0.5em;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.journals{
+  background-color: rgba(248, 173, 119, 0.845);
+  color: aliceblue;
+  text-align: center;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: medium;
+  align-items: center;
 }
