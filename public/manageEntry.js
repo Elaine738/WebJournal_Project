@@ -1,6 +1,4 @@
 //Create Individual Entry
-//CIE = "https://prod-18.uksouth.logic.azure.com:443/workflows/a08efa0d6edb484ab386ed85ec2e11d7/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=QoI6B1BscubW6pOEVe0IMwl_9GGeSvbLnptJwMJx1q4";
-
 CIE = "https://prod-18.uksouth.logic.azure.com:443/workflows/a08efa0d6edb484ab386ed85ec2e11d7/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=QoI6B1BscubW6pOEVe0IMwl_9GGeSvbLnptJwMJx1q4";
 
 //Retrieve All Entries - this logic app gets every entry correlating to a specific journal ID
@@ -16,7 +14,8 @@ RIE1 = "https://prod-32.uksouth.logic.azure.com/workflows/d44195ff4cd34e21836dc3
 RIE2 = "?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=0lby1O2iQJH2gc8SNpDW0vvLN0Bew-85LbBurx4bHfI";
 
 //Update Entry - this logic app updates the entry
-UE = "https://prod-10.ukwest.logic.azure.com:443/workflows/58fe4850016c49559c4088a0d557787b/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=H_1PcaxPIZc_Watdgw8Ykjx78zdRMZ6f2ySbFtqY48I";
+UE = "https://prod-10.ukwest.logic.azure.com/workflows/58fe4850016c49559c4088a0d557787b/triggers/When_a_HTTP_request_is_received/paths/invoke/";
+UE2 = "?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=H_1PcaxPIZc_Watdgw8Ykjx78zdRMZ6f2ySbFtqY48I";
 
 //Storage account for the multimedia
 BLOB_ACCOUNT = "https://webjournalstorage.blob.core.windows.net";
@@ -76,6 +75,7 @@ $(document).ready(function() {
 
 function submitNewEntry(){
  submitData = new FormData();
+ var fd = new FormData(document.getElementById('newEntryForm'));
 
  //get current date in readable format
  const date = new Date();
@@ -84,24 +84,31 @@ function submitNewEntry(){
  let year = date.getFullYear();
  let currentDate = `${day}-${month}-${year}`;
 
+ const title = 
+
  submitData.append('title', $('#title').val());
  submitData.append('body', $('#body').val());
  submitData.append('createdAt', currentDate);
  submitData.append('journalID', journalId);
  submitData.append('userID', userId);
 
- if($("#imageInput")[0].files[0] == undefined){
-  
- }
  
- submitData.append('image', $("#imageInput")[0].files[0]);
- console.log('imageInput: ', $("#imageInput")[0].files[0]);
-
- submitData.append('video', $("#videoInput")[0].files[0]);
- console.log('videoInput: ', $("#videoInput")[0].files[0]);
-
+ let image = $("#imageInput")[0].files[0];
+ let video = $("#videoInput")[0].files[0];
+ let audio =$("#audioInput")[0].files[0];
+ if(image){
+  submitData.append('image', $("#imageInput")[0].files[0]) ;
+  console.log('imageInput: ', image);
+ }
+ if(video){
+  submitData.append('video', $("#videoInput")[0].files[0]);
+  console.log('videoInput: ', $("#videoInput")[0].files[0]);
+ }
+ if(audio){
  submitData.append('audio', $("#audioInput")[0].files[0]);
  console.log('audioInput: ', $("#audioInput")[0].files[0]);
+ }
+ 
 
  /*
  // multiple files can be added to 1 entry
@@ -114,6 +121,14 @@ function submitNewEntry(){
 }
 */
 
+for (var pair of submitData.entries()) {
+  console.log(pair[0]+ ', ' + pair[1]); 
+}
+console.log('------------------------');
+console.table([...submitData]);
+console.log('------------------------');
+console.log(...submitData);
+
  $.ajax({
   url: CIE,
   data: submitData,
@@ -123,8 +138,8 @@ function submitNewEntry(){
   processData: false,
   type: 'POST',
   success: function(data){
-    alert("Entry created successfully!");
-    window.location = 'entries/' + journalId;
+    window.alert("Entry created successfully!");
+    window.location.pathname = 'entries/' + journalId;
 
  }
  });
@@ -182,7 +197,7 @@ function getEntries() {
         console.log('Image: ', img.src);
         
         //if a image was not chosen when creating the entry - do not display the broken image icon
-        if(img.src == 'https://webjournalstorage.blob.core.windows.netundefined/'){
+        if(imagefilePath == 'n/a' || !imagefilePath){
           img.style.display = "none";
         }
 
@@ -196,7 +211,7 @@ function getEntries() {
           console.log('Video display: ', videoSource.src);
         
         //if an image was not chosen when creating the entry - do not display the broken image icon
-        if(videoSource.src == 'https://webjournalstorage.blob.core.windows.netundefined/'){
+        if(videofilePath == 'n/a' || !videofilePath){
           video.style.display = "none";
           console.log('video undefined');
         }
@@ -210,7 +225,7 @@ function getEntries() {
           console.log('Else statement');
         
         //if an image was not chosen when creating the entry - do not display the broken image icon
-        if(audio.src == 'https://webjournalstorage.blob.core.windows.netundefined/'){
+        if(audiofilePath == 'n/a' || !audiofilePath){
           audio.style.display = "none";
           console.log('filePath != undefined');
         }
@@ -233,6 +248,10 @@ $("#cancelView").on("click", function() {
       $.getJSON(RIE1 + entryId + RIE2, function(data) {
         $("#editTitle").val(data.title);
         $("#editBody").val(data.body);
+        //$("#editEntryImage").val(image);
+        //$("#editEntryVideo").val(video);
+        //$("#editEntryAudio").val(audio);
+        
 
         $("#EditEntry").show();
         $("#EntriesList").hide();
@@ -253,22 +272,58 @@ $("#cancelView").on("click", function() {
       const ENTRY = RIE1 + entryId + RIE2;
 
       $.getJSON(ENTRY, function(data) {
-        const updatedData = {
-          id: entryId,
-          filePath: data.filePath,
-          fileLocator: entryId,
-          createdAt: data.createdAt,
-          journalId: journalId,
-          title: $("#editTitle").val() || data.title,
-          body: $("#editBody").val() || data.body
-        };
+        newImage = $("#editEntryImage")[0].files[0];
+        newVideo = $("#editEntryVideo")[0].files[0];
+        newAudio = $("#editEntryAudio")[0].files[0];
+
+        submitData = new FormData();
+        submitData.append('id', entryId);
+        if(newImage){
+          submitData.append('image', newImage);
+        }
+        else{
+          submitData.append('imageFilePath', data.imageFilePath);
+          submitData.append('imageFileLocator', data.imageFileLocator);
+        }
+        if(newVideo){
+          submitData.append('video', newVideo);
+        }
+        else{
+          submitData.append('videoFilePath', data.videoFilePath);
+          submitData.append('videoFileLocator', data.videoFileLocator);
+        }
+        if(newAudio){
+          submitData.append('audio', newAudio);
+        }
+        else{
+          submitData.append('audioFilePath', data.audioFilePath);
+          submitData.append('audioFileLocator', data.audioFileLocator);
+        }
+        submitData.append('userID', data.userID);          
+        submitData.append('title', $("#editTitle").val());
+        submitData.append('body', $("#editBody").val());
+        submitData.append('journalID', data.journalId);    
+        submitData.append('createdAt', data.createdAt);
+
+
+        for (var pair of submitData.entries()) {
+          console.log(pair[0]+ ', ' + pair[1]); 
+        }
+        console.log('------------------------');
+        console.table([...submitData]);
+        console.log('------------------------');
+        console.log(...submitData);
+
 
 
         $.ajax({
           type: "PUT",
-          url: UE,
-          data: JSON.stringify(updatedData),
-          contentType: "application/json",
+          url: UE + entryId + UE2,
+          data: submitData,
+          cache: false,
+          enctype: "multipart/form-data",
+          contentType: false,
+          processData: false,
           success: function() {
             alert("Entry updated successfully!");
             getEntries();

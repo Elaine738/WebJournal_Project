@@ -2,9 +2,13 @@
 
 //Create Individual Journal - allows user to create their new journal
 CIJ = "https://prod-03.ukwest.logic.azure.com:443/workflows/fe03f09bead94bf2991c35ed44e5f327/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=wSxGq-yTWriVowlNApTuLmCl9OwypgeSLs5oWobdQys";
+//CIJNoImage - Logic app designed to handle no image being added
+CIJNoImage = "https://prod-00.uksouth.logic.azure.com:443/workflows/6c7c3dee5f224f77b0efe4699291cd5f/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=A3d7vGBDrvIyLdg2mWvpaxHTSbcsGNNmoyL5GGVoP_Q";
+
 //Retrieve All Journals - allows user to view their journals upon registering or logging in
 RAJ1 = "https://prod-00.uksouth.logic.azure.com/workflows/dbebdcf4ca5c4b9c9e991fe436cf1f38/triggers/When_a_HTTP_request_is_received/paths/invoke/journals/";
 RAJ2 = "?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=4a-KNy3roqCYdg_IYc3xhnFPsW5FtZ1oxJcgtJRWqCs";
+
 //Retrieve Individual Journal - needed for editing details
 RIJ1 = "https://prod-19.uksouth.logic.azure.com/workflows/4c3c838289dc490f9949823edeb1c51b/triggers/When_a_HTTP_request_is_received/paths/invoke/journal/";
 RIJ2 = "?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=D65TyHGar6T6FWvLZfuZ80Qv8kYoEZBjeQ-3I0Jw2H4";
@@ -14,8 +18,9 @@ DIJ1 = "https://prod-28.ukwest.logic.azure.com/workflows/991fb177d6c849ca9963052
 DIJ2 = "?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=QxbzXl_1-2hnO_FY_I452LNTgwRyRkWfI2PPTRHcyFs";
 
 //Update Individual Journal 1 + 2 split so that a unique ID can be placed inbetween when sending a request
-UIJ1 = "https://prod-08.ukwest.logic.azure.com/workflows/bf91eab02c924b2592ad484be3178f40/triggers/When_a_HTTP_request_is_received/paths/invoke/update/journal/";
-UIJ2 = "?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=soAytIHb0W3cPy6tS0meZ8e3Rk-vCLF47nUSIu843hQ";
+UIJ1 = "https://prod-07.uksouth.logic.azure.com/workflows/271dd71a8f324304a2f4e61630b7055a/triggers/When_a_HTTP_request_is_received/paths/invoke/";
+UIJ2 = "?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=u5O8RqY86mnsI2NE1BR7RTE9MLGqhfSyJTeqFRovS3M";
+
 //Link to blob account where multimedia is stored
 BLOB_ACCOUNT = "https://webjournalstorage.blob.core.windows.net";
 
@@ -38,14 +43,17 @@ $(document).ready(function() {
 function submitNewJournal(){
  //Create a form data object
  submitData = new FormData();
+ 
  //Get form variables and append them to the form data object
- submitData.append('journalName', $('#title').val());
- submitData.append('File', $("#UpFile")[0].files[0]);
- submitData.append('userID', userId);
+ // check if an image has been attached and upload to the according logic app
+ if(!$('input[type="file"]').val()) {
+  submitData.append('journalName', $('#title').val());
+  submitData.append('userID', userId);
+  console.log('no file');
 
- //Post the form data to the CIJ (create individual journal) endpoint in azure
+   //Post the form data to the CIJNoImage (create individual journal - no image) endpoint in azure if no image is attached
  $.ajax({
-  url: CIJ,
+  url: CIJNoImage,
   data: submitData,
   cache: false,
   enctype: 'multipart/form-data',
@@ -55,8 +63,35 @@ function submitNewJournal(){
   success: function(data){
     alert("Journal created successfully!");
     document.getElementById("newJournalForm").reset();
+    window.location.pathname = '/dashboard';
+  },
+  fail: function(data){
+    alert("Journal created successfully!");
+    document.getElementById("newJournalForm").reset();
+    window.location.pathname = '/dashboard';
   }
 });  
+} else{
+  submitData.append('journalName', $('#title').val());
+  submitData.append('File', $("#UpFile")[0].files[0]);
+  submitData.append('userID', userId);
+
+   //Post the form data to the CIJ (create individual journal) endpoint in azure if an image is attached
+  $.ajax({
+    url: CIJ,
+    data: submitData,
+    cache: false,
+    enctype: 'multipart/form-data',
+    contentType: false,
+    processData: false,
+    type: 'POST',
+    success: function(data){
+      alert("Journal created successfully!");
+      document.getElementById("newJournalForm").reset();
+      window.location.pathname = '/dashboard';
+    }
+  });  
+ }
 
 }
 
@@ -76,7 +111,10 @@ function getJournals() {
       console.log(data);
       items.push("<hr />");
       items.push("<h1 style='font-size:25px;'>" + val["journalName"] + "</h1> <br />");
-      items.push("<img src='" + BLOB_ACCOUNT + val["filePath"] + "'class='img-thumbnail' width='400'/> <br/>");
+      if(val["filePath"] != 'n/a'){
+        items.push("<img src='" + BLOB_ACCOUNT + val["filePath"] + "'class='img-thumbnail' width='400'/> <br/>");
+      }
+      console.log(val["filePath"]);
 
       items.push(`<button class='btn btn-outline-danger delete-button' data-id='${val["id"]}' style='margin-top: 10px;'>Delete Journal</button><br/>`);
       items.push(`<button class='btn btn-outline-secondary edit-button' data-id='${val["id"]}' style='margin-top: 10px;'>Edit Journal</button> <br/>`);
@@ -112,7 +150,7 @@ function getJournals() {
         $("#editJournalName").val(data.journalName);
         console.log("#editJournalName:", $("#editJournalName").val())
         //$("#editJournalName").val(data.journalName);
-    
+
         $("#EditJournal").show(); 
         $("#JournalList").hide(); 
     
@@ -133,23 +171,43 @@ function getJournals() {
     
       // Fetch current post details (if needed for confirmation or fallback)
       $.getJSON(GETJOURNAL, function(data) {
-        const updatedData = {
-          id: journalId,
-          filePath: data.filePath,
-          fileLocator: journalId,
-          userID: data.userID,
-          journalName: $("#editJournalName").val(),
-        };
-    
-        // Send the PUT request
+        newImage = $("#editJournalImage")[0].files[0];
+        journalName = $("#editJournalName").val();
+        submitData = new FormData();
+        if(!newImage){
+          submitData.append('filePath', data.filePath);
+          submitData.append('fileLocator', data.fileLocator);
+        }
+        else{
+          submitData.append('image', newImage);
+        }
+        submitData.append('id', journalId);
+        submitData.append('userID', data.userID);          
+        submitData.append('journalName', journalName);
+
+        console.log('editJournalImage',$("#editJournalImage")[0].files[0]);
+      
+
+        for (var pair of submitData.entries()) {
+          console.log(pair[0]+ ', ' + pair[1]); 
+        }
+        console.log('------------------------');
+        console.table([...submitData]);
+        console.log('------------------------');
+        console.log(...submitData);
+
         $.ajax({
           type: "PUT",
           url: UIJ1 + journalId + UIJ2,
-          data: JSON.stringify(updatedData),
-          contentType: "application/json",
+          data: submitData,
+          cache: false,
+          enctype: "multipart/form-data",
+          contentType: false,
+          processData: false,
           success: function() {
             alert("Journal updated successfully!");
             getJournals();
+            console.log('image attached');
             $("#EditJournal").hide();
             $("#JournalList").show(); 
           },
@@ -157,19 +215,24 @@ function getJournals() {
             alert("Failed to update the Journal.");
           },
         });
-      });
     });
+  });
 
   });
+
 }
 
 function deleteJournal(id) {
   $.ajax({
     type: "DELETE",
     url: DIJ1 + id + DIJ2,
-  })
-    .done(function() {
+    success: function(data){
       alert("Journal deleted successfully!");
       getJournals();
-    })
+    },
+    error: function(data){
+      alert("Journal deleted successfully!");
+      getJournals();
+    }
+  })
 }

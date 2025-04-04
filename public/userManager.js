@@ -14,12 +14,26 @@ $(document).ready(function() {
     
   }); 
 
-  $(".delete-button").on("click", function() {
-    id = userId;
-    deleteAccount(id);
-  });
-});
+  $("#deleteAccount").click(function(){
 
+    deleteAccount(userId);
+    
+  }); 
+
+  $("#savePassword").click(function(){
+    console.log('changepassword clicked');
+
+    const newPassword = $("#newPassword").val();
+    console.log('newPassword:', newPassword);
+
+    if (!newPassword) {
+      alert('Please enter a new password');
+      return;
+    }
+    saveNewPassword(newPassword);
+    
+  }); 
+});
 
 
 async function registerFunction(){
@@ -54,38 +68,43 @@ async function registerFunction(){
 
 }
 
-function deleteAccount(id){
+
+async function deleteAccount(id){
   console.log('deleteAccount reached');
   userID = id;
 
-  //insert code to delete account from MongoDB here
-  var url = "mongodb://localhost:27017/";
-
-  mongoose.connect(url, function(err, db) {
-    if (err) throw err;
-    var dbo = db.db("users");
-    var myquery = { "_id": ObjectId(id) };
-    dbo.collection("users").deleteOne(myquery, function(err, obj) {
-      if (err) throw err;
-      console.log("1 document deleted");
-      db.close();
+  if (confirm("Are you sure you want to delete your account? This action cannot be undone!")) {
+    const response = await fetch("/account", { 
+      method: "DELETE"
     });
-  });
 
-  $.ajax({
-    type: "DELETE",
-    url: DAJ1 + userID + DAJ2,
-  })
-    .done(function() {
-      console.log("DAJ success")
-    })
+    if (response.ok) {
+      alert("Your account has been deleted.");
+      window.location.href = "/";
+    } else {
+      alert("Error deleting account.");
+    }
+  }
 
-    $.ajax({
-      type: "DELETE",
-      url: DAE1 + userID + DAE2,
-    })
-      .done(function() {
-        console.log("DAE success")
-      })
+}
+async function saveNewPassword(password){
+  console.log('saveNewPassword code code reached');
+  console.log('userID:',userId);
+  //const newPassword = document.getElementById('newPassword').value;
+  alert('message received!');
+  const newPassword = password;
+
+  try {
+    console.log('trying......................................................................');
+    const response = await fetch('/account', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, newPassword })
+    });
+
+    alert('success!');
+  } catch (error) {
+    alert('an error has occured!', error);
+  }
 
 }

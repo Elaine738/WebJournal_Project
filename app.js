@@ -17,6 +17,7 @@ const port = 3000;
 
 mongoose.connect("mongodb://localhost/27017");
 app.set("view engine", "ejs");
+app.use(express.json());
 
 
 app.use(express.static(path.join(__dirname, "public")));
@@ -38,7 +39,6 @@ passport.deserializeUser(User.deserializeUser());
 
 //end of geeks for geeks code
 
-//const User = require('./model/User');
 
 // fix for MIME type error when trying to invoke javascript files
 app.use(express.static('public', {
@@ -134,17 +134,49 @@ app.post("/login", async function(req, res){
     }
 });
 
-app.post("/deleteAccount", async function(req, res){
-  const userId = req.params;
-  const user = await User.findOne({ "_id": ObjectId(userId) });
-  if (user) {
-    User.deleteOne(user, function(err, obj) {
-      if (err) throw err;
-      console.log("1 document deleted");
-  });
-}else{
-  res.status(400).send({ error });
-}
+app.delete("/account", async function(req, res){
+  console.log('app.delete reached');
+
+  //take the id of the user currently logged in
+  //will always have value as is only accessible to users who are logged in
+  const id = req.session.userId;
+  console.log(id);
+
+  //find user by id and delete their record from Mongo
+  //or give error message
+  try {
+    await User.findByIdAndDelete(id); 
+    res.status(200).json({ message: "Account deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting account", error });
+  }
+});
+
+app.put('/account', async (req, res) => {
+  console.log('/update-password reached');
+  const { userId, newPassword } = req.body;
+  console.log('req.body', req.body);
+  console.log('body:', userId, newPassword);
+
+  try {
+    if (!userId || !newPassword) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    console.log('user found----------------------------------------------------');
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
+
+    res.status(200).json({ message: 'Password updated successfully' });
+    console.log('/update-password reached')
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+    console.log('/update-password reached')
+  }
 });
 
 
@@ -155,47 +187,6 @@ app.get("/logout", function (req, res) {
       res.redirect('/');
     });
 });
-
-
-/* old register system
-app.post('/register', async(request, response) =>{
-    let CIU = "https://prod-04.ukwest.logic.azure.com/workflows/f0c9f6d8978f401bb66b505320f0405b/triggers/When_a_HTTP_request_is_received/paths/invoke/register?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=x64fYlaLHPsJ5ovDODDeknsf--aJLEMOFLYwACzO5C0";
-
-    const bcrypt = require('bcrypt');
-    const { email, username, password } = request.body;
-    submitData = new FormData();
-  
-  try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const userId = uuidv4(); 
-
-    submitData.append('userID', userId);
-    submitData.append('email', email);
-    submitData.append('username', username);
-    submitData.append('passwordHash',hashedPassword);
-
-    $.ajax({
-        url: CIU,
-        data: submitData,
-        cache: false,
-        enctype: 'multipart/form-data',
-        contentType: false,
-        processData: false,
-        type: 'POST',
-        success: function(data){
-         
-        }
-      });
-
-
-    res.json({ message: 'User registered successfully', userId, username, email });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Server error during registration' });
-  }
-})
-*/
-  
 
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);

@@ -9,11 +9,42 @@
 
 body{
   background-color: peachpuff;
-  color: #636b6f;
+  color: #4b5255;
   font-family: 'Raleway';
   height: 100vh;
   margin: 0;
 }
+
+#chatContainer {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  height: 400px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: #f9f9f9;
+}
+
+#chatHeader {
+  background-color: #0078d7;
+  color: white;
+  padding: 10px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+
+#webchat {
+  flex: 1;
+}
+
 
 #journalStyle{
   background-color: rgb(191, 101, 37);
@@ -24,6 +55,11 @@ body{
   font-family:Playwrite IT Moderna, serif;
 }
 
+#navigation{
+  background-color: rgba(244, 47, 47, 0.409);
+  font-size: 20px;
+  color: antiquewhite;
+}
 
 .center {
   position: absolute;
