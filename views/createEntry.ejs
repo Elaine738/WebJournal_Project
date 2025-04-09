@@ -60,7 +60,8 @@
               </div>
             <div class="mb-3">
               <label for="fileInput" class="form-label">Add Image:</label>
-              <input type="file" class="form-control" id="imageInput">
+              <input type="file" class="form-control" id="imageInput" accept="image/*">
+              <!-- the 'accept' function will only show users valid files when going to upload an image but this is easily worked around-->
               <div id="previewContainer"></div>
               <script>
               const imageInput = document.getElementById('imageInput');
@@ -93,12 +94,12 @@
 
             <div class="mb-3">
               <label for="fileInput" class="form-label">Add Video:</label>
-              <input type="file" class="form-control" id="videoInput">
+              <input type="file" class="form-control" id="videoInput" accept="video/*">
             </div>
 
             <div class="mb-3">
               <label for="fileInput" class="form-label">Add Audio:</label>
-              <input type="file" class="form-control" id="audioInput">
+              <input type="file" class="form-control" id="audioInput" accept="audio/*">
             </div>
 
             <button type="button" id="subNewEntry" class="btn btn-primary">Save</button> <br/><br/>
@@ -107,9 +108,6 @@
         <div class="col-2"></div>
       </div>
 
-
     </div>
-
-
   </body>
 </html>

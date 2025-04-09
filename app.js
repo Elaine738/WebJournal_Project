@@ -128,7 +128,10 @@ app.post("/login", async function(req, res){
         req.session.username = user.username;
         res.redirect('/dashboard');
         return;
-      } 
+      }
+      else{
+        res.status(404).send('Error! There was an issue logging you in. Please check your details and try again.');
+      }
     } catch (error) {
       res.status(400).send({ error });
     }
