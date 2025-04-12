@@ -213,3 +213,27 @@ function deleteJournal(id) {
     }
   })
 }
+
+
+const imageInput = document.getElementById('UpFile');
+const previewContainer = document.getElementById('previewContainer');
+function previewSelectedImages() {
+  previewContainer.innerHTML = '';
+                
+  if (!imageInput.files.length) return;
+                
+  for (let i = 0; i < imageInput.files.length; i++) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.style.width = '170px';
+      img.style.borderRadius = '5px';
+      img.style.margin = '10px';
+      
+      previewContainer.appendChild(img);
+    };
+    reader.readAsDataURL(imageInput.files[i]);
+  }
+}
+imageInput.addEventListener('change', previewSelectedImages);
