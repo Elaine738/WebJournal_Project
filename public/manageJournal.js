@@ -93,9 +93,9 @@ function getJournals() {
       }
       console.log(val["filePath"]);
 
+      items.push(`<button class='btn btn-primary view-entries' data-id='${val["id"]}' style='margin-top: 10px;'>View Entries</button> <br/>`);
       items.push(`<button class='btn btn-outline-danger delete-button' data-id='${val["id"]}' style='margin-top: 10px;'>Delete Journal</button><br/>`);
       items.push(`<button class='btn btn-outline-secondary edit-button' data-id='${val["id"]}' style='margin-top: 10px;'>Edit Journal</button> <br/>`);
-      items.push(`<button class='btn btn-primary view-entries' data-id='${val["id"]}' style='margin-top: 10px;'>View Entries</button> <br/>`);
       items.push("<hr />");
       
     });

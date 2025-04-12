@@ -14,7 +14,7 @@
 
 
 <body>
-  <nav class="navbar navbar-inverse navbar-expand-lg bg-light p-3 mb-2 bg-secondary text-white">
+  <nav class="navbar navbar-inverse navbar-expand-lg p-3 mb-2 text-white" id="navigation">
     <div class="container-fluid">
       <a id="logo" class="navbar-brand">WebJournal</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,7 +42,7 @@
 
         <div class="row align-items-start">
           <div class="col-2"></div>
-          <div class="col-8" style="text-align: left; border-bottom: 1px solid #222222;">
+          <div class="col-8" id = loginRegister>
             <form style="font-size: 10pt;" action = "/login" method = "POST">
               <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
@@ -52,7 +52,7 @@
                   <label for="password" class="form-label">Password</label>
                   <input type="password" class="form-control" name="password" placeholder="password">
               </div>
-              <button type="submit" class="btn btn-primary">Login</button> <br/><br/>
+              <button type="submit" class="btn btn-primary" style = "width: 100%">Login</button> <br/><br/>
             </form>
           </div>
           <div class="col-2"></div>

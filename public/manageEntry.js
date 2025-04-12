@@ -110,7 +110,9 @@ function submitNewEntry(){
  }
  
 
- /*
+ /* attempt to allow users to add multiple files at a time for 1 multimedia type
+ this successfully allowed multiple file uploads but Azure logic apps didn't like it
+ 
  // multiple files can be added to 1 entry
  // this will loop through each file to add them individually
  var fileInput = document.getElementById('imageInput');
@@ -353,3 +355,75 @@ function deleteEntry(id) {
       getEntries();
     })
 }
+
+
+// The following code generates a preview for the selected image and video
+const imageInput = document.getElementById('imageInput');
+const previewContainer = document.getElementById('previewContainer');
+function previewSelectedImages() {
+  previewContainer.innerHTML = '';
+                
+  if (!imageInput.files.length) return;
+                
+  for (let i = 0; i < imageInput.files.length; i++) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.style.width = '170px';
+      img.style.borderRadius = '5px';
+      img.style.margin = '10px';
+      
+      previewContainer.appendChild(img);
+    };
+    reader.readAsDataURL(imageInput.files[i]);
+  }
+}
+imageInput.addEventListener('change', previewSelectedImages);  
+
+const videoInput = document.getElementById('videoInput');
+const previewVideo = document.getElementById('previewVideo');
+function previewSelectedVideos() {
+  previewVideo.innerHTML = '';
+                
+  if (!videoInput.files.length) return;
+                
+  for (let i = 0; i < videoInput.files.length; i++) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const video = document.createElement('video');
+      video.src = e.target.result;
+      video.style.width = '220px';
+      video.style.borderRadius = '5px';
+      video.style.margin = '10px';
+      video.controls = true;
+      
+      previewVideo.appendChild(video);
+    };
+    reader.readAsDataURL(videoInput.files[i]);
+  }
+}
+videoInput.addEventListener('change', previewSelectedVideos);  
+
+
+const audioInput = document.getElementById('audioInput');
+const previewAudio = document.getElementById('previewAudio');
+function previewSelectedAudios() {
+  previewAudio.innerHTML = '';
+                
+  if (!audioInput.files.length) return;
+                
+  for (let i = 0; i < audioInput.files.length; i++) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const audio = document.createElement('audio');
+      audio.src = e.target.result;
+      audio.style.margin = '10px';
+      audio.controls = true;
+      
+      previewAudio.appendChild(audio);
+    };
+    reader.readAsDataURL(audioInput.files[i]);
+  }
+}
+audioInput.addEventListener('change', previewSelectedAudios); 

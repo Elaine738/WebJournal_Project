@@ -12,14 +12,13 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Playwrite+IT+Moderna:wght@100..400&display=swap" rel="stylesheet">
-    <script type="text/javascript" src="/manageEntry.js"></script>
+    
     <link rel="stylesheet" type="text/css" href="/css/style.css" />
-  
   </head>
   
   <body>
 
-    <nav class="navbar navbar-inverse navbar-expand-lg bg-light p-3 mb-2 bg-secondary text-white">
+    <nav class="navbar navbar-inverse navbar-expand-lg p-3 mb-2 text-white" id="navigation">
       <div class="container-fluid">
         <a id="logo" class="navbar-brand">WebJournal</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,63 +42,38 @@
       </div>
   </nav>
 
-    <div class="container">
+    <div class="container" id="createEntry">
 
       <!-- New Entry Box -->
-      <div class="row align-items-start">
+      <div class="row align-items-start" id="entryForm">
         <div class="col-2"></div>
         <div class="col-8" style="text-align: left; border-bottom: 1px solid #222222;">
           <form style="font-size: 10pt;" id="newEntryForm">
             <div class="mb-3">
-              <label for="title" class="form-label">Title</label>
+              <label for="title" class="form-label" style="font-size: 15px;">Title</label>
               <input type="text" class="form-control" id="title">
             </div>
             <div class="mb-3">
-                <label for="body" class="form-label">Body</label>
+                <label for="body" class="form-label" style="font-size: 15px;">Body</label>
                 <textarea input type="text" id="body" class="form-control" name="body" rows="9" cols="50"></textarea>
               </div>
             <div class="mb-3">
-              <label for="fileInput" class="form-label">Add Image:</label>
-              <input type="file" class="form-control" id="imageInput" accept="image/*">
+              <label for="fileInput" class="form-label" style="font-size: 15px;">Add Image:</label>
+              <input type="file" class="form-control" style="padding: 6px 8px;" id="imageInput" accept="image/*">
               <!-- the 'accept' function will only show users valid files when going to upload an image but this is easily worked around-->
               <div id="previewContainer"></div>
-              <script>
-              const imageInput = document.getElementById('imageInput');
-              const previewContainer = document.getElementById('previewContainer');
-              
-              function previewSelectedImages() {
-                previewContainer.innerHTML = '';
-                const files = imageInput.files;
-                
-                if (!files.length) return;
-                
-                for (let i = 0; i < files.length; i++) {
-                  const reader = new FileReader();
-                  
-                  reader.onload = function (e) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.style.width = '170px';
-                    img.style.margin = '5px';
-                    img.style.borderRadius = '5px';
-                    
-                    previewContainer.appendChild(img);
-                  };
-                  reader.readAsDataURL(files[i]);
-                }
-              }
-              imageInput.addEventListener('change', previewSelectedImages);  
-             </script>
             </div>
 
             <div class="mb-3">
-              <label for="fileInput" class="form-label">Add Video:</label>
-              <input type="file" class="form-control" id="videoInput" accept="video/*">
+              <label for="fileInput" class="form-label" style="font-size: 15px;">Add Video:</label>
+              <input type="file" class="form-control" style="padding: 6px 8px;" id="videoInput" accept="video/*">
+              <div id="previewVideo"></div>
             </div>
 
             <div class="mb-3">
-              <label for="fileInput" class="form-label">Add Audio:</label>
-              <input type="file" class="form-control" id="audioInput" accept="audio/*">
+              <label for="fileInput" class="form-label" style="font-size: 15px;">Add Audio:</label>
+              <input type="file" class="form-control" style="padding: 6px 8px;" id="audioInput" accept="audio/*">
+              <div id="previewAudio"></div>
             </div>
 
             <button type="button" id="subNewEntry" class="btn btn-primary">Save</button> <br/><br/>
@@ -109,5 +83,6 @@
       </div>
 
     </div>
+    <script type="text/javascript" src="/manageEntry.js"></script>
   </body>
 </html>
