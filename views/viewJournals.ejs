@@ -15,8 +15,8 @@
 
   <!-- importing font from for WebJournal logo from Google fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playwrite+IT+Moderna:wght@100..400&display=swap" rel="stylesheet">
-  <script type="text/javascript" src="/manageJournal.js"></script>
   <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <script type="text/javascript" src="/manageJournal.js"></script>
 
   <!-- script src for chatbot-->
   <script src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
@@ -86,8 +86,36 @@
           </div>
           <div class="mb-3">
             <label for="editJournalImage" class="form-label">Cover Image:</label>
-            <input type="file" class="form-control" id="editJournalImage">
+            <input type="file" class="form-control" accept="image/*" id="editJournalImage">
+            <div id="editJournalPreview"></div>
           </div>
+          <script>
+          let editJournalImage = document.getElementById('editJournalImage');
+          let editJournalPreview = document.getElementById('editJournalPreview');
+
+          if (editJournalImage && editJournalPreview) {
+            function previewEditImages() {
+            editJournalPreview.innerHTML = '';
+                
+            if (!editJournalImage.files.length) return;
+                
+            for (let i = 0; i < editJournalImage.files.length; i++) {
+              const reader = new FileReader();
+              reader.onload = function (e) {
+              const img = document.createElement('img');
+              img.src = e.target.result;
+              img.style.width = '170px';
+              img.style.borderRadius = '5px';
+              img.style.margin = '10px';
+      
+              editJournalPreview.appendChild(img);
+            };
+            reader.readAsDataURL(editJournalImage.files[i]);
+          }
+        }
+        editJournalImage.addEventListener('change', previewEditImages);
+      }
+          </script>
           <button type="button" id="saveEdit" class="btn btn-success">Save Changes</button>
           <button type="button" id="cancelEdit" class="btn btn-secondary">Cancel</button>
         </form>

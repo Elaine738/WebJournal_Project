@@ -7,12 +7,6 @@ DAE2 = "?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received
 
 //Handlers for button clicks
 $(document).ready(function() {
-  
-  $("#register").click(function(){
-
-    registerFunction();
-    
-  }); 
 
   $("#deleteAccount").click(function(){
 
@@ -34,39 +28,6 @@ $(document).ready(function() {
     
   }); 
 });
-
-
-async function registerFunction(){
-    submitData = new FormData();
-
-    var email = $('#email').val();
-    var username = $('#username').val();
-    var password = $('#password').val();
-
-    
-    $.ajax({
-      url: '/register',
-      type: 'POST',
-      contentType: false,
-      processData: false,
-      data: {
-        email: email,
-        username: username,
-        password: password
-      },
-      success: function(response) {
-        console.log('Registration successful', response);
-        alert("Registration successful!");
-        window.location = '/'
-
-      },
-      error: function(xhr, status, error) {
-        console.error('Registration failed', error);
-        alert("Registration failed. Please try again.");
-      }
-    });
-
-}
 
 
 async function deleteAccount(id){
@@ -91,7 +52,7 @@ async function saveNewPassword(password){
   console.log('saveNewPassword code code reached');
   console.log('userID:',userId);
   //const newPassword = document.getElementById('newPassword').value;
-  alert('message received!');
+  alert('Password saved successfully!');
   const newPassword = password;
 
   try {

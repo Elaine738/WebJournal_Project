@@ -106,6 +106,7 @@ app.get('/newEntry/:id',(req, res) => {
 
 
 //User Registration System
+// based on geeksforgeeks tutorial but modified to encrypt password and add email
 app.post("/register", async (req, res) => {
   const hash = bcrypt.hashSync(req.body.password, 10);
 
@@ -119,9 +120,9 @@ app.post("/register", async (req, res) => {
 });
 
 //User login
+// based on geeksforgeeks code but modified to check compare hashed passwords and to redirect the user upon success
 app.post("/login", async function(req, res){
   try {
-      // check if the user exists
       const user = await User.findOne({ email: req.body.email });
       if (user && bcrypt.compareSync(req.body.password, user.password)) {
         req.session.userId = user._id;
@@ -155,35 +156,9 @@ app.delete("/account", async function(req, res){
   }
 });
 
-app.put('/account', async (req, res) => {
-  console.log('/update-password reached');
-  const { userId, newPassword } = req.body;
-  console.log('req.body', req.body);
-  console.log('body:', userId, newPassword);
-
-  try {
-    if (!userId || !newPassword) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
-
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: 'User not found' });
-
-    console.log('user found----------------------------------------------------');
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(newPassword, salt);
-    await user.save();
-
-    res.status(200).json({ message: 'Password updated successfully' });
-    console.log('/update-password reached')
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-    console.log('/update-password reached')
-  }
-});
-
 
 //Handling user logout 
+// based on geeksforgeeks tutorial
 app.get("/logout", function (req, res) {
   req.logout(function(err) {
       if (err) { return next(err); }

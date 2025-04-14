@@ -215,8 +215,10 @@ function deleteJournal(id) {
 }
 
 
-const imageInput = document.getElementById('UpFile');
-const previewContainer = document.getElementById('previewContainer');
+let imageInput = document.getElementById('UpFile');
+let previewContainer = document.getElementById('previewContainer');
+
+if (imageInput && previewContainer) {
 function previewSelectedImages() {
   previewContainer.innerHTML = '';
                 
@@ -237,3 +239,4 @@ function previewSelectedImages() {
   }
 }
 imageInput.addEventListener('change', previewSelectedImages);
+}
